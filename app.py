@@ -4,7 +4,6 @@ from PIL import Image
 
 st.set_page_config(page_title="健保藥品查詢介面", layout="centered")
 
-
 # 🏷️ 標題
 st.title("2024 健保申報藥品數量查詢介面（初代機）")
 
@@ -50,11 +49,6 @@ if keyword:
             file_name=file_name,
             mime="text/csv",
         )
-        # 🖼️ 顯示郵票圖片（縮小版）
-stamp = Image.open("white6_stamp.jpg")  # 確保圖片檔案與 app.py 在同一目錄
-st.image(stamp, caption="白六航空 壹圓 郵票", width=90)
 else:
     st.info("請輸入主成分以進行查詢")
-
-
 
