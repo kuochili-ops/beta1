@@ -5,7 +5,7 @@ from PIL import Image
 st.set_page_config(page_title="健保藥品查詢介面", layout="centered")
 
 # 🖼️ 顯示郵票圖片（縮小版）
-stamp = Image.open("white6_stamp.jpeg")  # 確保圖片檔案與 app.py 在同一目錄
+stamp = Image.open("white6_stamp.jpg")  # 確保圖片檔案與 app.py 在同一目錄
 st.image(stamp, caption="白六航空 壹圓 郵票", width=180)
 
 # 🏷️ 標題
@@ -55,3 +55,4 @@ if keyword:
         )
 else:
     st.info("請輸入主成分以進行查詢")
+
