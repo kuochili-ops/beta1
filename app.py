@@ -52,7 +52,7 @@ if keyword:
         summary.rename(columns={"使用量": "累計總量"}, inplace=True)
         summary["累計總量"] = summary["累計總量"].round(1)
         summary.insert(0, "序號", range(1, len(summary) + 1))
-        st.write("✅ 查詢結果（同藥品名稱規格累計）：")
+        st.write("✅ 查詢結果（藥品同規格分類累計）：")
         st.dataframe(summary.set_index("序號"))
 
         # ⬇️ 提供下載功能
@@ -70,3 +70,4 @@ else:
 # 🖼️ 最後顯示郵票圖片（縮小版）
 stamp = Image.open("white6_stamp.jpg")  # 確保圖片檔案與 app.py 在同一目錄
 st.image(stamp, caption="白六航空 壹圓 郵票", width=90)
+
