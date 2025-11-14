@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from PIL import Image
+import wikipedia
 
 st.set_page_config(page_title="健保藥品查詢介面", layout="centered")
 
@@ -19,6 +20,20 @@ df = pd.read_csv(
 keyword = st.text_input("請輸入主成分")
 
 if keyword:
+    # 📘 Wikipedia 查詢用途
+    wikipedia.set_lang("zh")
+    try:
+        summary = wikipedia.summary(keyword, sentences=2)
+        st.write("📘 主成分用途（來自 Wikipedia）：")
+        st.info(summary)
+        page = wikipedia.page(keyword)
+        st.markdown(f"[🔗 查看完整 Wikipedia 頁面]({page.url})")
+    except wikipedia.exceptions.PageError:
+        st.warning("找不到 Wikipedia 頁面，可能需要更精確的主成分名稱。")
+    except wikipedia.exceptions.DisambiguationError as e:
+        st.warning(f"主成分名稱過於模糊，請選擇更具體的詞，例如：{e.options[:3]}")
+
+    # 📊 查詢結果
     result = df[df["藥品名稱"].str.contains(keyword, case=False, na=False)].copy()
 
     if result.empty:
