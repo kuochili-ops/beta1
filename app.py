@@ -4,7 +4,7 @@ import pandas as pd
 st.title("2024 健保申報藥品數量查詢介面（初代測試機）")
 
 # 直接讀取同目錄下的 CSV 檔案
-df = pd.read_csv("pay2024(UTF-8).csv", encoding="utf-8")
+df = pd.read_csv("merged_pay2024.csv", encoding="utf-8")
 
 keyword = st.text_input("請輸入主成分")
 
@@ -38,5 +38,6 @@ if keyword:
         file_name="累計查詢結果.csv",
         mime="text/csv",
     )
+
 
 
