@@ -76,7 +76,7 @@ if keyword:
         detail["使用量"] = detail["使用量"].round(1)
         detail = detail.reset_index(drop=True)
         st.write("🔴 查詢結果（逐筆明細）：")
-        st.table(detail)
+        st.table(detail, hide_index=True)
         st.caption(f"共 {len(detail)} 筆")
 
         # ✅ 累計表格（依藥品名稱加總）
@@ -86,7 +86,7 @@ if keyword:
         summary.insert(0, "序號", range(1, len(summary) + 1))
         summary = summary.reset_index(drop=True)
         st.write("✅ 查詢結果（藥品同名稱累計）：")
-        st.table(summary)
+        st.table(summary, hide_index=True)
         st.caption(f"共 {len(summary)} 筆")
 
         # ⬇️ 提供下載功能
@@ -103,4 +103,5 @@ else:
 
 # 🖼️ 郵票圖片
 stamp = Image.open("white6_stamp.jpg")
+
 
