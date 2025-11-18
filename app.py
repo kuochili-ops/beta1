@@ -82,14 +82,18 @@ if keyword:
         st.dataframe(detail, hide_index=True)
         st.caption(f"共 {len(detail)} 筆")
 
-        # ✅ 藥品同名稱累計表格
+        # ✅ 藥品同名稱累計表格（移除支付價，增加百分比）
         summary = result.groupby("藥品名稱", as_index=False).agg(
             {"使用量": "sum", "支付價": "mean"}
         )
         summary.rename(columns={"使用量": "累計總量"}, inplace=True)
         summary["累計總量"] = summary["累計總量"].round(1)
-        summary["支付價"] = summary["支付價"].round(1)
         summary["累計總金額"] = (summary["累計總量"] * summary["支付價"]).round(1)
+
+        total_amount = summary["累計總金額"].sum()
+        summary["百分比"] = (summary["累計總金額"] / total_amount * 100).round(1)
+
+        summary = summary[["藥品名稱", "累計總量", "累計總金額", "百分比"]].copy()
         summary.insert(0, "序號", range(1, len(summary) + 1))
         summary = summary.reset_index(drop=True)
 
@@ -97,12 +101,16 @@ if keyword:
         st.dataframe(summary, hide_index=True)
         st.caption(f"共 {len(summary)} 筆")
 
-        # 🏢 藥商累計總金額表格（只顯示藥商與總金額）
+        # 🏢 藥商累計總金額表格（只顯示藥商、總金額、百分比）
         company_summary = result.groupby("藥商", as_index=False).agg(
             {"使用量": "sum", "支付價": "mean"}
         )
         company_summary["累計總金額"] = (company_summary["使用量"] * company_summary["支付價"]).round(1)
-        company_summary = company_summary[["藥商", "累計總金額"]].copy()
+
+        total_company_amount = company_summary["累計總金額"].sum()
+        company_summary["百分比"] = (company_summary["累計總金額"] / total_company_amount * 100).round(1)
+
+        company_summary = company_summary[["藥商", "累計總金額", "百分比"]].copy()
         company_summary.insert(0, "序號", range(1, len(company_summary) + 1))
         company_summary = company_summary.reset_index(drop=True)
 
