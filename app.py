@@ -74,13 +74,13 @@ if keyword:
     else:
         result["使用量"] = result["數量"].round(1)
 
-        # 🔴 逐筆明細表格
-        detail = result[["藥品代碼", "藥品名稱", "藥商", "使用量"]].copy()
+        # 🔴 逐筆明細表格（移除藥品代碼欄位）
+        detail = result[["藥品名稱", "藥商", "使用量"]].copy()
         st.write("🔴 查詢結果（逐筆明細）：")
         st.dataframe(detail)
         st.caption(f"共 {len(detail)} 筆")
 
-        # ✅ 累計表格
+        # ✅ 累計表格（移除藥品代碼）
         summary = result.groupby("藥品名稱", as_index=False)["使用量"].sum()
         summary.rename(columns={"使用量": "累計總量"}, inplace=True)
         summary["累計總量"] = summary["累計總量"].round(1)
