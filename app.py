@@ -68,8 +68,9 @@ if keyword:
     if result.empty:
         st.warning("查無符合藥品")
     else:
+        # 強制轉換支付價為數值型態
         result["使用量"] = result["數量"].round(1)
-        result["支付價"] = result["支付價"].round(1)
+        result["支付價"] = pd.to_numeric(result["支付價"], errors="coerce").round(1)
 
         # 🔴 逐筆明細表格（加上支付價與總金額）
         detail = result[["藥品代碼", "藥品名稱", "藥商", "使用量", "支付價"]].copy()
@@ -93,3 +94,7 @@ if keyword:
         summary = summary.reset_index(drop=True)
 
         st.write("✅ 查詢結果（藥品同名稱累計）：")
+        st.dataframe(summary, hide_index=True)
+        st.caption(f"共 {len(summary)} 筆")
+
+        # ⬇️ 提供下載功能
