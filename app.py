@@ -70,22 +70,23 @@ if keyword:
     else:
         result["使用量"] = result["數量"].round(1)
 
-        # 🔴 逐筆明細表格（加序號、移除索引、格式化）
+        # 🔴 逐筆明細表格
         detail = result[["藥品代碼", "藥品名稱", "藥商", "使用量"]].copy()
         detail.insert(0, "序號", range(1, len(detail) + 1))
-        detail["使用量"] = detail["使用量"].map("{:.1f}".format)
+        detail["使用量"] = detail["使用量"].round(1)
+        detail = detail.reset_index(drop=True)
         st.write("🔴 查詢結果（逐筆明細）：")
-        st.table(detail.reset_index(drop=True))
+        st.table(detail)
         st.caption(f"共 {len(detail)} 筆")
 
-        # ✅ 累計表格（依藥品名稱加總，加序號、移除索引、格式化）
+        # ✅ 累計表格（依藥品名稱加總）
         summary = result.groupby("藥品名稱", as_index=False)["使用量"].sum()
         summary.rename(columns={"使用量": "累計總量"}, inplace=True)
         summary["累計總量"] = summary["累計總量"].round(1)
         summary.insert(0, "序號", range(1, len(summary) + 1))
-        summary["累計總量"] = summary["累計總量"].map("{:.1f}".format)
+        summary = summary.reset_index(drop=True)
         st.write("✅ 查詢結果（藥品同名稱累計）：")
-        st.table(summary.reset_index(drop=True))
+        st.table(summary)
         st.caption(f"共 {len(summary)} 筆")
 
         # ⬇️ 提供下載功能
@@ -101,5 +102,4 @@ else:
     st.info("請輸入主成分以進行查詢")
 
 # 🖼️ 郵票圖片
-stamp = Image.open("white6_stamp.jpg")
-st.image(stamp, caption="白六航空 壹圓 郵票", width=90)
+stamp = Image.open("white
