@@ -34,11 +34,11 @@ def normalize_query(query, alias_map):
     # Step 1: 別名比對
     for standard, aliases in alias_map.items():
         if q == standard.lower() or q in [a.lower() for a in aliases]:
-            return standard, None  # 映射成功，沒有修正
+            return standard, None
     # Step 2: 拼字修正
     match = difflib.get_close_matches(q, drug_list, n=1, cutoff=0.7)
     if match:
-        return match[0], q  # 修正後名稱 & 原始輸入
+        return match[0], q
     return q, None
 
 # 🔍 查詢輸入
@@ -47,7 +47,6 @@ keyword = st.text_input("請輸入主成分或俗稱")
 if keyword:
     normalized, original = normalize_query(keyword, alias_map)
 
-    # 顯示提示訊息
     if original and normalized != original:
         st.info(f"您是不是要查詢：**{normalized}**？（原始輸入：{original}）")
     else:
@@ -74,18 +73,18 @@ if keyword:
     else:
         result["使用量"] = result["數量"].round(1)
 
-        # 🔴 逐筆明細表格（移除藥品代碼欄位）
-        detail = result[["藥品名稱", "藥商", "使用量"]].copy()
+        # 🔴 逐筆明細表格（保留藥品代碼，移除索引欄位）
+        detail = result[["藥品代碼", "藥品名稱", "藥商", "使用量"]].copy()
         st.write("🔴 查詢結果（逐筆明細）：")
-        st.dataframe(detail)
+        st.dataframe(detail.reset_index(drop=True))
         st.caption(f"共 {len(detail)} 筆")
 
-        # ✅ 累計表格（移除藥品代碼）
-        summary = result.groupby("藥品名稱", as_index=False)["使用量"].sum()
+        # ✅ 累計表格（保留藥品代碼，移除索引欄位）
+        summary = result.groupby(["藥品代碼", "藥品名稱"], as_index=False)["使用量"].sum()
         summary.rename(columns={"使用量": "累計總量"}, inplace=True)
         summary["累計總量"] = summary["累計總量"].round(1)
         st.write("✅ 查詢結果（藥品同規格分類累計）：")
-        st.dataframe(summary)
+        st.dataframe(summary.reset_index(drop=True))
         st.caption(f"共 {len(summary)} 筆")
 
         # ⬇️ 提供下載功能
