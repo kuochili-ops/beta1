@@ -82,7 +82,7 @@ if keyword:
         st.dataframe(detail, hide_index=True)
         st.caption(f"共 {len(detail)} 筆")
 
-        # ✅ 累計表格（依藥品名稱加總）
+        # ✅ 藥品同名稱累計表格
         summary = result.groupby("藥品名稱", as_index=False).agg(
             {"使用量": "sum", "支付價": "mean"}
         )
@@ -97,7 +97,20 @@ if keyword:
         st.dataframe(summary, hide_index=True)
         st.caption(f"共 {len(summary)} 筆")
 
-        # ⬇️ 提供下載功能
+        # 🏢 藥商累計總金額表格（只顯示藥商與總金額）
+        company_summary = result.groupby("藥商", as_index=False).agg(
+            {"使用量": "sum", "支付價": "mean"}
+        )
+        company_summary["累計總金額"] = (company_summary["使用量"] * company_summary["支付價"]).round(1)
+        company_summary = company_summary[["藥商", "累計總金額"]].copy()
+        company_summary.insert(0, "序號", range(1, len(company_summary) + 1))
+        company_summary = company_summary.reset_index(drop=True)
+
+        st.write("🏢 查詢結果（藥商累計總金額）：")
+        st.dataframe(company_summary, hide_index=True)
+        st.caption(f"共 {len(company_summary)} 家藥商")
+
+        # ⬇️ 提供下載功能（下載藥品累計結果）
         csv = summary.to_csv(index=False, encoding="utf-8-sig")
         file_name = f"{normalized}_累計查詢結果.csv"
         st.download_button(
