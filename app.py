@@ -73,19 +73,19 @@ if keyword:
     else:
         result["使用量"] = result["數量"].round(1)
 
-        # 🔴 逐筆明細表格（保留藥品代碼，移除索引欄位）
+        # 🔴 逐筆明細表格（移除索引欄）
         detail = result[["藥品代碼", "藥品名稱", "藥商", "使用量"]].copy().reset_index(drop=True)
         st.write("🔴 查詢結果（逐筆明細）：")
-        st.dataframe(detail)
+        st.dataframe(detail, use_container_width=True)
         st.caption(f"共 {len(detail)} 筆")
 
-        # ✅ 累計表格（保留藥品代碼，移除索引欄位）
+        # ✅ 累計表格（移除索引欄）
         summary = result.groupby(["藥品代碼", "藥品名稱"], as_index=False)["使用量"].sum()
         summary.rename(columns={"使用量": "累計總量"}, inplace=True)
         summary["累計總量"] = summary["累計總量"].round(1)
         summary = summary.reset_index(drop=True)
         st.write("✅ 查詢結果（藥品同規格分類累計）：")
-        st.dataframe(summary)
+        st.dataframe(summary, use_container_width=True)
         st.caption(f"共 {len(summary)} 筆")
 
         # ⬇️ 提供下載功能
