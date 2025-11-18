@@ -98,3 +98,17 @@ if keyword:
         st.caption(f"共 {len(summary)} 筆")
 
         # ⬇️ 提供下載功能
+        csv = summary.to_csv(index=False, encoding="utf-8-sig")
+        file_name = f"{normalized}_累計查詢結果.csv"
+        st.download_button(
+            label="下載累計查詢結果 CSV",
+            data=csv,
+            file_name=file_name,
+            mime="text/csv",
+        )
+else:
+    st.info("請輸入主成分以進行查詢")
+
+# 🖼️ 郵票圖片
+stamp = Image.open("white6_stamp.jpg")
+st.image(stamp, caption="白六航空 壹圓 郵票", width=90)
