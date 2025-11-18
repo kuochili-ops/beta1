@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 import wikipedia
-from rapidfuzz import process
+import difflib
 
 st.set_page_config(page_title="健保藥品查詢介面", layout="centered")
 
@@ -17,32 +17,33 @@ df = pd.read_csv(
     low_memory=False
 )
 
-# 🗂️ 別名字典
+# 🗂️ 別名字典（俗稱 ↔ 學名）
 alias_map = {
+    "acetylsalicylic acid": ["aspirin", "阿司匹林", "乙醯水楊酸"],
     "acetaminophen": ["paracetamol", "tylenol", "撲熱息痛"],
     "ibuprofen": ["布洛芬", "advil", "motrin"],
-    # 可以持續擴充
 }
 
+# 建立完整藥品清單（標準名 + 別名）
 drug_list = list(alias_map.keys()) + [a for aliases in alias_map.values() for a in aliases]
 
-def normalize_query(query):
+def normalize_query(query, alias_map):
     q = query.lower().strip()
     # Step 1: 別名比對
     for standard, aliases in alias_map.items():
-        if q == standard or q in [a.lower() for a in aliases]:
+        if q == standard.lower() or q in [a.lower() for a in aliases]:
             return standard
     # Step 2: 拼字修正
-    match = process.extractOne(q, drug_list)
-    if match and match[1] > 70:
+    match = difflib.get_close_matches(q, drug_list, n=1, cutoff=0.7)
+    if match:
         return match[0]
-    return q  # 如果沒找到，就用原始輸入
+    return q
 
 # 🔍 查詢輸入
 keyword = st.text_input("請輸入主成分或俗稱")
 
 if keyword:
-    normalized = normalize_query(keyword)
+    normalized = normalize_query(keyword, alias_map)
     st.write(f"🔎 標準化查詢：**{normalized}**")
 
     # 📘 Wikipedia 查詢用途
