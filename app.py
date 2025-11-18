@@ -23,6 +23,7 @@ alias_map = {
     "acetylsalicylic acid": ["aspirin", "阿司匹林", "乙醯水楊酸"],
     "acetaminophen": ["paracetamol", "tylenol", "撲熱息痛"],
     "ibuprofen": ["布洛芬", "advil", "motrin"],
+    "terlipressin": ["特利加壓素", "TERLIPRESSIN", "特利普雷辛"],
 }
 
 # 建立完整藥品清單（標準名 + 別名）
@@ -31,11 +32,9 @@ drug_list = list(alias_map.keys()) + [a for aliases in alias_map.values() for a 
 # 🔍 標準化查詢
 def normalize_query(query, alias_map):
     q = query.lower().strip()
-    # Step 1: 別名比對
     for standard, aliases in alias_map.items():
         if q == standard.lower() or q in [a.lower() for a in aliases]:
             return standard, None
-    # Step 2: 拼字修正
     match = difflib.get_close_matches(q, drug_list, n=1, cutoff=0.7)
     if match:
         return match[0], q
@@ -63,42 +62,4 @@ if keyword:
     except wikipedia.exceptions.PageError:
         st.warning("找不到 Wikipedia 頁面，可能需要更精確的主成分名稱。")
     except wikipedia.exceptions.DisambiguationError as e:
-        st.warning(f"主成分名稱過於模糊，請選擇更具體的詞，例如：{e.options[:3]}")
-
-    # 📊 查詢結果
-    result = df[df["藥品名稱"].str.contains(normalized, case=False, na=False)].copy()
-
-    if result.empty:
-        st.warning("查無符合藥品")
-    else:
-        result["使用量"] = result["數量"].round(1)
-
-        # 🔴 逐筆明細表格（保留藥品代碼，移除索引欄位）
-        detail = result[["藥品代碼", "藥品名稱", "藥商", "使用量"]].copy()
-        st.write("🔴 查詢結果（逐筆明細）：")
-        st.dataframe(detail.reset_index(drop=True))
-        st.caption(f"共 {len(detail)} 筆")
-
-        # ✅ 累計表格（保留藥品代碼，移除索引欄位）
-        summary = result.groupby(["藥品代碼", "藥品名稱"], as_index=False)["使用量"].sum()
-        summary.rename(columns={"使用量": "累計總量"}, inplace=True)
-        summary["累計總量"] = summary["累計總量"].round(1)
-        st.write("✅ 查詢結果（藥品同規格分類累計）：")
-        st.dataframe(summary.reset_index(drop=True))
-        st.caption(f"共 {len(summary)} 筆")
-
-        # ⬇️ 提供下載功能
-        csv = summary.to_csv(index=False, encoding="utf-8-sig")
-        file_name = f"{normalized}_累計查詢結果.csv"
-        st.download_button(
-            label="下載累計查詢結果 CSV",
-            data=csv,
-            file_name=file_name,
-            mime="text/csv",
-        )
-else:
-    st.info("請輸入主成分以進行查詢")
-
-# 🖼️ 郵票圖片
-stamp = Image.open("white6_stamp.jpg")
-st.image(stamp, caption="白六航空 壹圓 郵票", width=90)
+        st.warning(f"主成分名稱過於模糊，請選擇更具體的詞，例如：{e.options
