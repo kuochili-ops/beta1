@@ -102,4 +102,5 @@ else:
     st.info("請輸入主成分以進行查詢")
 
 # 🖼️ 郵票圖片
-stamp = Image.open("white
+stamp = Image.open("white6_stamp.jpg")
+
