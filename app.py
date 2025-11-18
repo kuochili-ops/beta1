@@ -67,7 +67,7 @@ if keyword:
         detail = result[["藥品代碼", "藥品名稱", "藥商", "使用量"]].copy()
         detail.insert(0, "序號", range(1, len(detail) + 1))  # 從 1 開始
         st.write("🔴 查詢結果（逐筆明細）：")
-        st.dataframe(detail, use_container_width=True)
+        st.table(detail.style.hide(axis="index"))  # ✅ 隱藏索引欄位
         st.caption(f"共 {len(detail)} 筆")
 
         # ✅ 累計表格（依藥品名稱加總）
@@ -76,7 +76,7 @@ if keyword:
         summary["累計總量"] = summary["累計總量"].round(1)
         summary.insert(0, "序號", range(1, len(summary) + 1))  # 從 1 開始
         st.write("✅ 查詢結果（藥品同名稱累計）：")
-        st.dataframe(summary, use_container_width=True)
+        st.table(summary.style.hide(axis="index"))  # ✅ 隱藏索引欄位
         st.caption(f"共 {len(summary)} 筆")
 
         # ⬇️ 提供下載功能
@@ -93,4 +93,5 @@ else:
 
 stamp = Image.open("white6_stamp.jpg")
 st.image(stamp, caption="白六航空 壹圓 郵票", width=90)
+
 
